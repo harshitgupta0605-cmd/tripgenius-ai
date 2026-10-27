@@ -1,0 +1,6 @@
+{
+  "name": "TripGenius AI — Personalized Travel Itinerary Planner",
+  "description": "Create personalized, AI-powered travel itineraries for solo travelers, couples, families, and groups with interactive day-by-day timelines, budget breakdowns, day regeneration, maps, and trip management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

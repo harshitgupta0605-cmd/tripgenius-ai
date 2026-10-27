@@ -1,0 +1,125 @@
+from typing import List, Optional
+from fastapi import APIRouter, Query
+
+router = APIRouter(prefix="/api/destinations", tags=["destinations"])
+
+FEATURED_DESTINATIONS = [
+    {
+        "id": "dest-jaipur",
+        "name": "Jaipur",
+        "country": "India",
+        "region": "Rajasthan",
+        "category": "cultural",
+        "tagline": "The Pink City of Maharajas, Forts & Vibrant Bazaars",
+        "description": "Known as the Pink City, Jaipur is steeped in royal history with iconic terracotta-pink architecture, UNESCO world heritage astronomical observatories, and magnificent hill forts overlooking ancient lakes.",
+        "image_url": "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80",
+        "main_attractions": ["Amber Fort", "Hawa Mahal", "City Palace", "Jantar Mantar", "Nahargarh Fort Sunset"],
+        "best_time_to_visit": "October to March (Pleasant dry winter)",
+        "indicative_budget_range": "$30 - $90 / day",
+        "suggested_duration_days": 3,
+        "popularity_score": 96,
+        "currency": "INR"
+    },
+    {
+        "id": "dest-kyoto",
+        "name": "Kyoto",
+        "country": "Japan",
+        "region": "Kansai",
+        "category": "cultural",
+        "tagline": "Ancient Temples, Serene Zen Gardens & Traditional Teahouses",
+        "description": "The cultural heart of Japan, featuring thousands of Buddhist temples, Shinto shrines with vermilion torii gates, preserved wooden machiya houses, and tranquil bamboo groves.",
+        "image_url": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80",
+        "main_attractions": ["Fushimi Inari-taisha", "Kinkaku-ji (Golden Pavilion)", "Arashiyama Bamboo Grove", "Gion Geisha District", "Kiyomizu-dera"],
+        "best_time_to_visit": "March-May (Cherry Blossoms) or October-November (Autumn foliage)",
+        "indicative_budget_range": "$90 - $220 / day",
+        "suggested_duration_days": 4,
+        "popularity_score": 98,
+        "currency": "JPY"
+    },
+    {
+        "id": "dest-barcelona",
+        "name": "Barcelona",
+        "country": "Spain",
+        "region": "Catalonia",
+        "category": "cultural",
+        "tagline": "Gaudí Masterpieces, Mediterranean Tapas & Coastal Energy",
+        "description": "A seaside metropolis celebrating artistic genius with Antoni Gaudí's whimsical architecture, lively tapas bars in the Gothic Quarter, and sun-soaked Mediterranean beaches.",
+        "image_url": "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1200&q=80",
+        "main_attractions": ["Sagrada Família", "Park Güell", "Gothic Quarter", "Casa Batlló", "Barceloneta Beach"],
+        "best_time_to_visit": "May to June, September to October",
+        "indicative_budget_range": "$80 - $200 / day",
+        "suggested_duration_days": 4,
+        "popularity_score": 95,
+        "currency": "EUR"
+    },
+    {
+        "id": "dest-amalfi",
+        "name": "Amalfi Coast",
+        "country": "Italy",
+        "region": "Campania",
+        "category": "romantic",
+        "tagline": "Cliffside Pastel Towns, Lemon Groves & Azure Waters",
+        "description": "Dramatic cliffs plunging into the Tyrrhenian Sea, pastel-painted fishing villages, fragrant lemon terraced groves, and world-class seaside dining.",
+        "image_url": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80",
+        "main_attractions": ["Positano Cliffside", "Ravello Gardens & Villa Rufolo", "Amalfi Cathedral", "Path of the Gods Hike"],
+        "best_time_to_visit": "April to June or September to October",
+        "indicative_budget_range": "$140 - $350 / day",
+        "suggested_duration_days": 4,
+        "popularity_score": 94,
+        "currency": "EUR"
+    },
+    {
+        "id": "dest-bali",
+        "name": "Bali",
+        "country": "Indonesia",
+        "region": "Lesser Sunda Islands",
+        "category": "nature",
+        "tagline": "Emerald Rice Terraces, Volcanic Peaks & Spiritual Wellness",
+        "description": "The Island of the Gods offers lush rainforest canopies, sacred water temples, world-class surf breaks, and tranquil holistic wellness retreats.",
+        "image_url": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80",
+        "main_attractions": ["Tegalalang Rice Terraces", "Ubud Sacred Monkey Forest", "Uluwatu Sunset Temple", "Mount Batur Sunrise Trek"],
+        "best_time_to_visit": "April to October (Dry season)",
+        "indicative_budget_range": "$35 - $110 / day",
+        "suggested_duration_days": 5,
+        "popularity_score": 97,
+        "currency": "USD"
+    },
+    {
+        "id": "dest-swiss-alps",
+        "name": "Interlaken & Swiss Alps",
+        "country": "Switzerland",
+        "region": "Bernese Oberland",
+        "category": "adventure",
+        "tagline": "Glacial Peaks, Alpine Meadows & High-Altitude Thrills",
+        "description": "Surrounded by snow-capped giants Jungfrau, Eiger, and Mönch, this alpine paradise is the ultimate destination for hiking, cogwheel rail journeys, and scenic serenity.",
+        "image_url": "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1200&q=80",
+        "main_attractions": ["Jungfraujoch Top of Europe", "Lauterbrunnen Valley of 72 Waterfalls", "Grindelwald First Cliff Walk", "Lake Brienz Cruise"],
+        "best_time_to_visit": "June to September (Hiking) or December to March (Skiing)",
+        "indicative_budget_range": "$150 - $380 / day",
+        "suggested_duration_days": 4,
+        "popularity_score": 93,
+        "currency": "CHF"
+    }
+]
+
+@router.get("/featured")
+async def get_featured_destinations():
+    return {"destinations": FEATURED_DESTINATIONS}
+
+@router.get("/search")
+async def search_destinations(
+    query: Optional[str] = Query(None, description="Search by name, country, or keyword"),
+    category: Optional[str] = Query(None, description="Filter by category: adventure, romantic, cultural, nature, beaches, budget")
+):
+    results = FEATURED_DESTINATIONS
+    if category and category.lower() != "all":
+        results = [d for d in results if d["category"].lower() == category.lower()]
+
+    if query:
+        q = query.lower()
+        results = [
+            d for d in results 
+            if q in d["name"].lower() or q in d["country"].lower() or q in d["description"].lower()
+        ]
+
+    return {"destinations": results, "total": len(results)}
